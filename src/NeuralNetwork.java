@@ -5,20 +5,38 @@ public class NeuralNetwork {
 	private int inputLayerSize;
 	private int outputLayerSize;
 	private int hiddenLayerSize;
-	private Matrix input;
-	private Matrix weights1;
-	private Matrix weights2;
+	private Matrix inputLayer;
+	private Matrix leftWeights;
+	private Matrix rightWeights;
+	private Matrix middleLayer;
+	private Matrix activatedMiddle;
+	private Matrix outputLayer;
+	private Matrix activatedOutput;
 
 	public NeuralNetwork() {
 		this.hiddenLayerSize = 3;
 		this.outputLayerSize = 1;
 		this.inputLayerSize = 2;
-		this.weights1 = Matrix.random(inputLayerSize, hiddenLayerSize);
-		this.weights2 = Matrix.random(hiddenLayerSize, outputLayerSize);
+		this.leftWeights = Matrix.random(inputLayerSize, hiddenLayerSize);
+		this.rightWeights = Matrix.random(hiddenLayerSize, outputLayerSize);
 	}
 
-	private double sigmoid(double z) {
-		return 1 / (1 + Math.exp(-z));
+	private Matrix sigmoid(Matrix m) {
+		double[][] array = m.getArray();
+		for(int i = 0; i<m.getRowDimension();i++) {
+			for(int j = 0; j<m.getColumnDimension();j++) {
+				array[i][j] = 1 / (1 + Math.exp(array[i][j]));
+			}
+		}
+		return Matrix.constructWithCopy(array);
+	}
+	
+	public Matrix forward(Matrix X) {
+		this.middleLayer = X.times(this.leftWeights);
+		this.activatedMiddle = sigmoid(middleLayer);
+		this.outputLayer = activatedMiddle.times(this.rightWeights);
+		this.activatedOutput = sigmoid(outputLayer);
+		return activatedOutput;
 	}
 
 }
